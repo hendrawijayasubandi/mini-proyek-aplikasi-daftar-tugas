@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\URL;
 
 class StudentController extends Controller
 {
@@ -15,13 +17,26 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        $student = new Student;
-        $student->name = $request->name;
-        $student->class = $request->class;
-        $student->status = $request->status;
+        // Validasi request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'class' => 'required|numeric',
+            'status' => 'required|boolean',
+        ]);
+
+        // Simpan data
+        $student = new Student([
+            'name' => $request->input('name'),
+            'class' => $request->input('class'),
+            'status' => $request->input('status'),
+        ]);
+
         $student->save();
 
-        return response()->json(['message' => 'Student added successfully']);
+        // Buat response JSON dengan URL students
+        $response = Response::json(['message' => 'Data siswa berhasil disimpan', 'redirect' => URL::to('/students')]);
+
+        return $response;
     }
 
     public function updateStatus(Request $request, $id)
@@ -62,5 +77,23 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         return view('students.delete', compact('student'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'class' => 'required|in:9,10,11,12',
+        ]);
+
+        $student = Student::findOrFail($id);
+
+        $student->update([
+            'name' => $request->input('name'),
+            'class' => $request->input('class'),
+            'status' => $request->input('status') == 'on' ? 1 : 0,
+        ]);
+
+        return redirect()->route('students.index')->with('success', 'Siswa berhasil diperbarui.');
     }
 }

@@ -24,10 +24,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="status">Status</label>
-                                <select class="form-control" id="status" name="status" required>
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Non-Aktif</option>
-                                </select>
+                                <input type="hidden" name="status" value="0">
+                                <!-- Hidden input for non-checked status -->
+                                <input type="checkbox" name="status" id="statusToggle"
+                                    {{ old('status') == 1 ? 'checked' : '' }}>
                             </div>
                             <button type="submit" class="btn btn-primary">Tambah</button>
                         </form>
@@ -37,25 +37,31 @@
         </div>
     </div>
 
-    <!-- Include jQuery for Ajax -->
+    <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Include your custom script for handling Ajax submission -->
     <script>
         $(document).ready(function() {
-            // Form submission using Ajax
+            $('#statusToggle').on('change', function() {
+                if ($(this).prop('checked')) {
+                    $(this).val('1'); // Aktif
+                } else {
+                    $(this).val('0'); // Non-Aktif
+                }
+            });
+
             $('#create-student-form').submit(function(e) {
                 e.preventDefault();
                 $.ajax({
                     type: 'POST',
-                    url: "{{ route('students.store') }}",
+                    url: "http://localhost:8000/students",
                     data: $(this).serialize(),
                     success: function(response) {
                         alert(response.message);
-                        // Clear form fields
                         $('#create-student-form')[0].reset();
-                        // Reload DataTable after adding a new student
                         $('#students-table').DataTable().ajax.reload();
+
+                        window.location.href = response.redirect;
                     },
                     error: function(error) {
                         console.log(error);

@@ -28,10 +28,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="status">Status</label>
-                                <select class="form-control" id="status" name="status" required>
+                                {{-- <select class="form-control" id="status" name="status" required>
                                     <option value="1" {{ $student->status == 1 ? 'selected' : '' }}>Aktif</option>
                                     <option value="0" {{ $student->status == 0 ? 'selected' : '' }}>Non-Aktif</option>
-                                </select>
+                                </select> --}}
+                                <input type="checkbox" name="status" id="statusToggle" data-bootstrap-switch data-on-text="Aktif" data-off-text="Non-Aktif" {{ $student->status == 1 ? 'checked' : '' }}>
                             </div>
                             <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                         </form>
@@ -41,3 +42,9 @@
         </div>
     </div>
 @endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#statusToggle').bootstrapSwitch();
+    });
+</script>
